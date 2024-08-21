@@ -2,13 +2,13 @@ package controller
 
 import (
 	"ambassador/src/database"
+	"ambassador/src/middleware"
 	"ambassador/src/models"
 	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(c *fiber.Ctx) error {
@@ -25,15 +25,15 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 12)
-
 	user := models.User{
-		FirstName:    data["first_name"],
-		LastName:     data["last_name"],
-		Email:        data["email"],
-		Password:     password,
+		FirstName: data["first_name"],
+		LastName:  data["last_name"],
+		Email:     data["email"],
+		// Password:     password,
 		IsAmbassador: false,
 	}
+
+	user.SetPassword(data["password"])
 
 	database.DB.Create(&user)
 
@@ -58,7 +58,7 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
+	if err := user.ComparePassword(data["password"]); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
 			"message": "Wrong Password",
@@ -89,6 +89,83 @@ func Login(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "Success",
+		"Email":   data["email"],
+		"Id":      strconv.Itoa(int(user.Id)),
 		"Cookie":  cookie.Value,
+	})
+}
+
+func User(c *fiber.Ctx) error {
+	id, _ := middleware.GetUserId(c)
+
+	var user models.User
+
+	database.DB.Where("id = ?", id).First(&user)
+
+	return c.JSON(user)
+}
+
+func Logout(c *fiber.Ctx) error {
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: true,
+	}
+
+	c.Cookie(&cookie)
+
+	return c.JSON(fiber.Map{
+		"MEssage": "Logout Success",
+	})
+}
+
+func UpdateInfo(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	id, _ := middleware.GetUserId(c)
+
+	user := models.User{
+		Id:        id,
+		FirstName: data["first_name"],
+		LastName:  data["last_name"],
+		Email:     data["email"],
+	}
+
+	database.DB.Model(&user).Updates(&user)
+
+	return c.JSON(user)
+}
+
+func UpdatePassword(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	if data["password"] != data["password_confirm"] {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"Message": "Password do not match",
+		})
+	}
+
+	id, _ := middleware.GetUserId(c)
+
+	user := models.User{
+		Id: id,
+	}
+
+	user.SetPassword(data["password"])
+
+	database.DB.Model(&user).Updates(&user)
+
+	return c.JSON(fiber.Map{
+		"Message": "Password Changed",
 	})
 }
