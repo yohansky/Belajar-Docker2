@@ -15,7 +15,7 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World aku yohaness")
+		return c.SendString("Hello, World aku yohanes")
 	})
 
 	app.Use(cors.New(cors.Config{
