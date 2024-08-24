@@ -28,5 +28,9 @@ func Setup(app *fiber.App) {
 	adminAuth.Post("products", controller.CreateProduct)
 	adminAuth.Put("product/:id", controller.UpdateProduct)
 	adminAuth.Delete("product/:id", controller.DeleteProduct)
+	// Link API
+	adminAuth.Get("users/:id/Links", controller.Links)
+	// Order API
+	adminAuth.Get("orders", controller.Orders)
 
 }
