@@ -33,4 +33,15 @@ func Setup(app *fiber.App) {
 	// Order API
 	adminAuth.Get("orders", controller.Orders)
 
+	//ambassador Routes (seller)
+	ambass := api.Group("ambassador")
+	ambass.Post("register", controller.Register)
+	ambass.Post("login", controller.Login)
+	//
+	ambassAuth := ambass.Use(middleware.IsAuth)
+	ambassAuth.Get("user", controller.User)
+	ambassAuth.Post("logout", controller.Logout)
+	ambassAuth.Put("users/info", controller.UpdateInfo)
+	ambassAuth.Put("users/password", controller.UpdatePassword)
+
 }
