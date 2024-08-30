@@ -14,3 +14,11 @@ func Ambassador(c *fiber.Ctx) error {
 
 	return c.JSON(users)
 }
+
+func Admin(c *fiber.Ctx) error {
+	var users []models.User
+
+	database.DB.Where("is_ambassador = false").Find(&users)
+
+	return c.JSON(users)
+}

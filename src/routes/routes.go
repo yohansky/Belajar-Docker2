@@ -23,6 +23,7 @@ func Setup(app *fiber.App) {
 	adminAuth.Put("users/info", controller.UpdateInfo)
 	adminAuth.Put("users/password", controller.UpdatePassword)
 	adminAuth.Get("ambassador", controller.Ambassador)
+	adminAuth.Get("admin", controller.Admin)
 	// Product API
 	adminAuth.Get("products", controller.AllProducts)
 	adminAuth.Post("products", controller.CreateProduct)
@@ -43,5 +44,11 @@ func Setup(app *fiber.App) {
 	ambassAuth.Post("logout", controller.Logout)
 	ambassAuth.Put("users/info", controller.UpdateInfo)
 	ambassAuth.Put("users/password", controller.UpdatePassword)
+	// Products API
+	// ambassAuth.Get("/product/frontend")
+	// ambassAuth.Get("/product/backend")
+	// ambassAuth.Post("/links")
+	// ambassAuth.Get("/stats")
+	// ambassAuth.Get("/rankings")
 
 }
