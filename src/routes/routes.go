@@ -38,6 +38,8 @@ func Setup(app *fiber.App) {
 	ambass := api.Group("ambassador")
 	ambass.Post("register", controller.Register)
 	ambass.Post("login", controller.Login)
+	ambass.Get("products/frontend", controller.ProductFrontend)
+	ambass.Get("products/backend", controller.ProductBackend)
 	//
 	ambassAuth := ambass.Use(middleware.IsAuth)
 	ambassAuth.Get("user", controller.User)
