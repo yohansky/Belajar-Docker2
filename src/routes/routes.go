@@ -49,8 +49,8 @@ func Setup(app *fiber.App) {
 	// Products API
 	// ambassAuth.Get("/product/frontend")
 	// ambassAuth.Get("/product/backend")
-	// ambassAuth.Post("/links")
-	// ambassAuth.Get("/stats")
+	ambassAuth.Post("links", controller.CreateLink)
+	ambassAuth.Get("stats", controller.Stats)
 	// ambassAuth.Get("/rankings")
 
 }
