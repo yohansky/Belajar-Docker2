@@ -3,6 +3,7 @@ package controller
 import (
 	"ambassador/src/database"
 	"ambassador/src/models"
+	"context"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
@@ -175,4 +176,50 @@ func CreateOrder(c *fiber.Ctx) error {
 	tx.Commit()
 
 	return c.JSON(order)
+}
+
+func CompleteOrder(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	order := models.Order{}
+
+	database.DB.Preload("OrderItems").First(&order, models.Order{
+		TransactionId: data["source"],
+	})
+
+	if order.Id == 0 {
+		c.Status(fiber.StatusNotFound)
+		return c.JSON(fiber.Map{
+			"Message": "order not found",
+		})
+	}
+
+	order.Complete = true
+	database.DB.Save(&order)
+
+	go func(order models.Order) {
+		ambassadorRevenue := 0.0
+		adminRevenue := 0.0
+
+		for _, item := range order.OrderItems {
+			ambassadorRevenue += item.AmbassadorRevenue
+			adminRevenue += item.AdminRevenue
+		}
+
+		user := models.User{}
+		user.Id = order.UserId
+
+		database.DB.First(&user)
+
+		database.Cache.ZIncrBy(context.Background(), "rangkings", ambassadorRevenue, user.Name())
+
+	}(order)
+
+	return c.JSON(fiber.Map{
+		"Message": "Success",
+	})
 }

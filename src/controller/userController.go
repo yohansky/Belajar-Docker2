@@ -32,7 +32,7 @@ func Rankings(c *fiber.Ctx) error {
 	// 	IsAmbassador: true,
 	// })
 
-	// var result []interface{}
+	var result []interface{}
 
 	// for _, user := range users {
 	// 	ambassador := models.Ambassador(user)
@@ -42,7 +42,8 @@ func Rankings(c *fiber.Ctx) error {
 	// 		user.Name(): ambassador.Revenue,
 	// 	})
 	// }
-	rangkings, err := database.Cache.ZRevRangeByScoreWithScores(context.Background(), "rangkings", &redis.ZRangeBy{
+
+	rangkings, err := database.Cache.ZRangeByScoreWithScores(context.Background(), "rangkings", &redis.ZRangeBy{
 		Min: "-inf",
 		Max: "+inf",
 	}).Result()
@@ -51,10 +52,21 @@ func Rankings(c *fiber.Ctx) error {
 		return err
 	}
 
-	result := make(map[string]float64)
+	// result := make(map[string]float64)
 
 	for _, rangking := range rangkings {
-		result[rangking.Member.(string)] = rangking.Score
+		member, ok := rangking.Member.(string)
+		if !ok {
+			c.Status(fiber.StatusInternalServerError)
+
+			return c.JSON(fiber.Map{
+				"Message": "failed to convert member to string!",
+			})
+		}
+		// result[member] = rangking.Score
+		result = append(result, fiber.Map{
+			member: rangking.Score,
+		})
 	}
 
 	return c.JSON(result)

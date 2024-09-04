@@ -56,6 +56,6 @@ func Setup(app *fiber.App) {
 	check := api.Group("checkout")
 	check.Get("links/:code", controller.GetLink)
 	check.Post("orders", controller.CreateOrder)
-	// check.Post("orders/confirm")
+	check.Post("orders/confirm", controller.CompleteOrder)
 
 }
