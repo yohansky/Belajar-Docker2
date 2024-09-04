@@ -12,6 +12,7 @@ func Setup(app *fiber.App) {
 	app.Get("product/:id", controller.GetProduct)
 
 	api := app.Group("api")
+	// Admin ROutes
 	admin := api.Group("admin")
 	admin.Post("register", controller.Register)
 	admin.Post("login", controller.Login)
@@ -47,10 +48,14 @@ func Setup(app *fiber.App) {
 	ambassAuth.Put("users/info", controller.UpdateInfo)
 	ambassAuth.Put("users/password", controller.UpdatePassword)
 	// Products API
-	// ambassAuth.Get("/product/frontend")
-	// ambassAuth.Get("/product/backend")
 	ambassAuth.Post("links", controller.CreateLink)
 	ambassAuth.Get("stats", controller.Stats)
 	ambassAuth.Get("rankings", controller.Rankings)
+
+	// Checkout Routes
+	check := api.Group("checkout")
+	check.Get("links/:code", controller.GetLink)
+	check.Post("orders", controller.CreateOrder)
+	// check.Post("orders/confirm")
 
 }

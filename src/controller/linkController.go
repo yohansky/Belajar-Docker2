@@ -18,7 +18,7 @@ func Links(c *fiber.Ctx) error {
 	database.DB.Where("user_id = ?", id).Find(&links)
 
 	for i, link := range links {
-		var orders models.Order
+		var orders []models.Order
 
 		database.DB.Where("code = ? and complete = true", link.Code).Find(&orders)
 
@@ -49,7 +49,7 @@ func CreateLink(c *fiber.Ctx) error {
 	for _, productId := range request.Products {
 		product := models.Product{}
 		product.Id = uint(productId)
-		link.Product = append(link.Product, product)
+		link.Products = append(link.Products, product)
 	}
 
 	database.DB.Create(&link)
@@ -90,4 +90,16 @@ func Stats(c *fiber.Ctx) error {
 		})
 	}
 	return c.JSON(result)
+}
+
+func GetLink(c *fiber.Ctx) error {
+	code := c.Params("code")
+
+	link := models.Link{
+		Code: code,
+	}
+
+	database.DB.Preload("User").Preload("Products").Find(&link)
+
+	return c.JSON(link)
 }
