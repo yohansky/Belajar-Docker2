@@ -6,9 +6,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/subosito/gotenv"
 )
 
 func main() {
+	gotenv.Load()
 	database.Connect()
 	database.AutoMigrate()
 	database.SetupRedis()

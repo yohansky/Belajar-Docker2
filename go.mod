@@ -40,6 +40,10 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
+	github.com/stripe/stripe-go v70.15.0+incompatible // indirect
+	github.com/stripe/stripe-go/v72 v72.122.0 // indirect
+	github.com/stripe/stripe-go/v79 v79.9.0 // indirect
+	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tdewolff/parse/v2 v2.7.12 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
