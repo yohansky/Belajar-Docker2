@@ -5,6 +5,7 @@ import (
 	"ambassador/src/models"
 	"context"
 	"fmt"
+	"net/smtp"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stripe/stripe-go/v72"
@@ -216,6 +217,16 @@ func CompleteOrder(c *fiber.Ctx) error {
 		database.DB.First(&user)
 
 		database.Cache.ZIncrBy(context.Background(), "rangkings", ambassadorRevenue, user.Name())
+
+		// Sending Email, "host.docker.internal:1025" = localhost on docker
+		ambassadorMessage := []byte(fmt.Sprintf("You earned $%f from the link #%s", ambassadorRevenue, order.Code))
+
+		smtp.SendMail("host.docker.internal:1025", nil, "no-reply@email.com", []string{order.AmbassadorEmail}, ambassadorMessage)
+
+		// Sending Email, "host.docker.internal:1025" = localhost on docker
+		adminMessage := []byte(fmt.Sprintf("Order #%d with a total of $%f has been completed", order.Id, adminRevenue))
+
+		smtp.SendMail("host.docker.internal:1025", nil, "no-reply@email.com", []string{"admin@admin.com"}, adminMessage)
 
 	}(order)
 
