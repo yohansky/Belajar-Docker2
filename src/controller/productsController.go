@@ -13,8 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var product models.Product
-
 func AllProducts(c *fiber.Ctx) error {
 	var products []models.Product
 
@@ -24,6 +22,8 @@ func AllProducts(c *fiber.Ctx) error {
 }
 
 func CreateProduct(c *fiber.Ctx) error {
+	var product models.Product
+
 	if err := c.BodyParser(&product); err != nil {
 		return err
 	}
@@ -36,6 +36,8 @@ func CreateProduct(c *fiber.Ctx) error {
 }
 
 func GetProduct(c *fiber.Ctx) error {
+	var product models.Product
+
 	id, _ := strconv.Atoi(c.Params("id"))
 
 	product.Id = uint(id)
@@ -74,6 +76,8 @@ func UpdateProduct(c *fiber.Ctx) error {
 }
 
 func DeleteProduct(c *fiber.Ctx) error {
+	var product models.Product
+
 	id, _ := strconv.Atoi(c.Params("id"))
 
 	product.Id = uint(id)
